@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css">
+
+      <title>Responsive Nav + Page Transitions</title>
+
+      <style>
+
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          font-family: sans-serif;
+          overflow-x: hidden;
+          background-color: #ddd;
+          background-image: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/65268a71-d0fc-4420-b985-2e0dcc0aaf9c/d5mb9o0-d5725650-cf7a-4494-8a9e-4e6ac83430c9.png/v1/fill/w_1192,h_670,q_70,strp/matrix_binary_code_wallpaper_by_treshku_by_treshkudrago_d5mb9o0-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTA4MCIsInBhdGgiOiJcL2ZcLzY1MjY4YTcxLWQwZmMtNDQyMC1iOTg1LTJlMGRjYzBhYWY5Y1wvZDVtYjlvMC1kNTcyNTY1MC1jZjdhLTQ0OTQtOGE5ZS00ZTZhYzgzNDMwYzkucG5nIiwid2lkdGgiOiI8PTE5MjAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.es8_A2_4uEGaRrzKGQ5_xGff4a_0u0_9-Y7Db71RC34');
+          background-size: cover;
+          background-repeat: repeat-y;
+          background-position: center top;
+        }
+
+        nav {
+          position: fixed;
+          top: 0;
+          width: 100%;
+          background: #649664;
+          color: white;
+          padding: 10px 20px; 
+          height: 52px;
+          justify-content: space-between;
+          align-items: center;
+          z-index: 100;
+          box-sizing: border-box;
+          min-height: 52px; 
+          overflow: hidden;
+        }
+
+        .nav-inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: nowrap; 
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .nav-links a {
+          color: white;
+          text-decoration: none;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        #logo {
+          text-decoration: none;
+          transition: transform 0.2s ease;
+          max-height: 32px;
+        }
+
+        #logo:hover {
+          transform: scale(1.5);
+        }
+
+        #logo-repository {
+          max-height: 32px;
+        }
+
+        .burger {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          cursor: pointer;
+          padding: 10px;
+          z-index: 200;
+          max-height: 32px;
+        }
+
+        .burger div {
+          width: 25px;
+          height: 3px;
+          background: white;
+        }
+
+        .mobile-menu {
+          display: none; 
+          flex-direction: column;
+          background: #647d64;
+          padding: 20px;
+          overflow: hidden;
+          text-align: left;
+          position: fixed; 
+          top: 52px; 
+          left: 0px; 
+          width: auto; 
+          border-top: 1px solid #444;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+          z-index: 100; 
+          opacity: 0; 
+          pointer-events: none; 
+          visibility: hidden; 
+          border-radius: 0 0 32px 0;
+        }
+
+        .mobile-menu.show {
+          display: flex; 
+          opacity: 1; 
+          pointer-events: auto; 
+          visibility: visible; 
+        }
+
+        .mobile-menu a {
+          color: white;
+          padding: 15px 0;
+          padding-right: 5px;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        #page-container {
+          flex-grow: 1;
+          position: relative;
+          top: 0;
+          height: 100vh - 52px;
+          transition: margin-left 0.3s ease;
+          top: 52px;
+        }
+
+        #page-container.shifted {
+          margin-left: 250px;
+        }
+
+        .page {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: max-height 2s ease, opacity 0.5s ease;
+          z-index: 1;
+          background: #fff;
+          padding: 20px;
+        }
+
+        .page.active {
+          max-height: 5000px;
+          opacity: 1;
+          z-index: 2;
+          overflow-y: auto;
+        }
+
+        .content {
+          max-width: 100%;
+          width: 100%;
+          box-sizing: border-box;
+          padding: 20px;
+          margin: 0 auto;
+          overflow-x: hidden;
+        }
+
+        pre {
+          padding: 20px;
+          border-radius: 5px;
+          overflow-x: auto;
+        }
+        
+        code {
+          font-family: monospace;
+          font-size: 14px;
+        }
+
+        .octicon path {
+          animation: rainbow 8s linear infinite;
+        }
+
+        @keyframes rainbow {
+          0% {
+            fill: red;
+          }
+          14% {
+            fill: orange;
+          }
+          28% {
+            fill: yellow;
+          }
+          42% {
+            fill: green;
+          }
+          57% {
+            fill: blue;
+          }
+          71% {
+            fill: indigo;
+          }
+          85% {
+            fill: violet;
+          }
+          100% {
+            fill: red;
+          }
+        }
+
+        .left-link {
+            display: none;
+        }
+
+        @media (min-width: 1280px) {
+
+            .burger {
+              display: none;
+            }
+
+            .left-link {
+              display: flex;
+              margin-right: auto;
+              max-height: 32px;
+            }
+
+            .left-link a {
+              color: white;
+              text-decoration: none;
+              font-size: 16px;
+              padding: 10px;
+            }
+
+        }
+
+        .side-links {
+          position: fixed;
+          top: 52px;
+          width: 250px;
+          height: calc(100% - 52px);
+          background: #647d64;
+          color: white;
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+          transition: left 0.3s ease;
+        }
+
+        .side-links a {
+          color: white;
+          text-decoration: none;
+          padding: 10px 0;
+          font-size: 16px;
+          cursor: pointer;
+          min-height: 66px;
+        }
+
+        .side-links a.active-link {
+          font-weight: 999;
+          color: #fff;
+        }
+
+        @media (max-width: 1279px) {
+
+          .side-links {
+            display: none;
+          }
+
+          #page-container {
+            width: 100%;
+          }
+
+        }
+
+        .main-container {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          position: relative;
+        }
+
+        .video-thumbnail {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+        }
+      
+        .video-thumbnail img {
+          display: block;
+          max-width: 100%;
+          height: auto;
+          border-radius: 12px;
+        }
+      
+        .play-button {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(0, 0, 0, 0.6);
+          color: white;
+          font-size: 48px;
+          padding: 20px;
+          border-radius: 50%;
+          pointer-events: none; 
+        }
+
+        .Importance-container {
+          display: flex;
+          gap: 20px;
+          align-items: flex-start;
+          margin-top: 20px;
+        }
+
+        #Importance-tips {
+          flex: 1;
+        }
+
+        #Importance-image {
+          flex: 1;
+          overflow: hidden;
+          max-width: 600px;
+        }
+
+        #Importance-image img {
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .design-container {
+          display: flex; 
+          gap: 20px; 
+          align-items: flex-start; 
+          margin-top: 20px;
+        }
+
+        #design-tips {
+          flex: 1; 
+        }
+
+        #design-image {
+          flex: 1; 
+          overflow: hidden; 
+        }
+
+        #design-image img {
+          width: 100%; 
+          height: auto; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+
+        .Tool-container {
+          display: flex; 
+          gap: 20px; 
+          align-items: flex-start; 
+          margin-top: 20px;
+        }
+
+        #Tool-tips {
+          flex: 1; 
+          min-width: 700px;
+        }
+
+        #Tool-image {
+          flex: 1; 
+          overflow: hidden; 
+        }
+
+        #Tool-image img {
+          width: 100%; 
+          height: auto; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+
+        .Include-container {
+          display: flex; 
+          gap: 20px; 
+          align-items: flex-start; 
+          margin-top: 20px;
+        }
+
+        #Include-tips {
+          flex: 1; 
+          min-width: 700px;
+        }
+
+        #Include-image {
+          flex: 1; 
+          overflow: hidden; 
+        }
+
+        #Include-image img {
+          width: 100%; 
+          height: auto; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+
+        .Service-container {
+          display: flex; 
+          gap: 20px; 
+          align-items: flex-start; 
+          margin-top: 20px;
+        }
+
+        #Service-tips {
+          flex: 1; 
+          min-width: 500px;
+        }
+
+        #Service-image {
+          flex: 1; 
+          overflow: hidden; 
+        }
+
+        #Service-image img {
+          width: 100%; 
+          height: auto; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+        <nav>
+
+            <div class="nav-inner">
+
+                <div class="left-link">
+
+                  <a href="javascript:void(0);" onclick="changePage('Home');">Home</a>
+
+                </div>
+
+                <div class="burger" id="burgerBtn" onclick="toggleMobileMenu()"><div></div><div></div><div></div></div>
+
+                <a href="javascript:void(0);" id="logo" onclick="changePage('Logo');">
+
+                  <img src="https://avatars.githubusercontent.com/u/20764341?v=4" alt="Logo" style="width: 32px; height: 32px;">
+
+                </a>
+
+            </div>
+
+            <div class="mobile-menu" id="mobileMenu">
+
+              <a id="Link-Home" onclick="changePage('Home'); toggleMobileMenu()">Home</a>
+
+              <a id="Link-Importance" onclick="changePage('Importance'); toggleMobileMenu()">Why Portfolios Matter</a>
+
+              <a id="Link-Includes" onclick="changePage('Includes'); toggleMobileMenu()">Programming Portfolio Includes</a>
+
+              <a id="Link-Design" onclick="changePage('Design'); toggleMobileMenu()">Design tips for your Development</a>
+
+              <a id="Link-Showcase" onclick="changePage('Showcase'); toggleMobileMenu()">Showcasing complete Projects</a>
+
+              <a id="Link-Services" onclick="changePage('Services'); toggleMobileMenu()">Services & Platforms</a>
+
+              <a id="Link-Links" onclick="changePage('Tools'); toggleMobileMenu()">Helpful Links</a>
+
+              <a id="Link-Reference" onclick="changePage('References'); toggleMobileMenu()">Reference</a>
+
+            </div>
+
+        </nav>
+
+        <div class="main-container">
+            
+          <div class="side-links" id="sideLinks">
+
+            <a id="Link-Importance" onclick="changePage('Importance');">Why Portfolios Matter</a>
+
+            <a id="Link-Includes" onclick="changePage('Includes');">Programming Portfolio Includes</a>
+
+            <a id="Link-Design" onclick="changePage('Design');">Design tips for your Development</a>
+
+            <a id="Link-Showcase" onclick="changePage('Showcase');">Showcasing complete Projects</a>
+
+            <a id="Link-Services" onclick="changePage('Services');">Services & Platforms</a>
+
+            <a id="Link-Links" onclick="changePage('Tools');">Helpful Links</a>
+
+            <a id="Link-Reference" onclick="changePage('References');">References</a>
+
+          </div>
+
+          <div id="page-container">
+
+            <div id="Home" class="page active">
+
+              <div class="content">
+            
+                <h1>Welcome to Your Portfolio Blueprint</h1>
+
+                <p>
+                  Whether you're a first-semester programmer or just weeks away from graduation, one thing is true: <strong>you need a portfolio.</strong> 
+                  This site is here to help you build one—from scratch, with purpose, and without needing to be a professional designer.
+                </p>
+            
+                <p>
+                  A portfolio does more than show off your code—it tells your story. It shows recruiters what you've built, how you think, and why you're ready for real-world challenges.
+                </p>
+            
+                <h3>What You'll Find Here</h3>
+
+                <ul style="line-height: 1.8;">
+
+                  <li><strong>Why portfolios matter</strong> — Especially for students and new devs.</li>
+
+                  <li><strong>What to include</strong> — The essential sections every dev portfolio needs.</li>
+
+                  <li><strong>How to design it</strong> — Even if you have zero design skills.</li>
+
+                  <li><strong>How to present your projects</strong> — Show your work like a pro.</li>
+
+                  <li><strong>What materials for your Story</strong> — Everything from GitHub Pages to video recording tools.</li>
+
+                  <li><strong>Guide across the realm</strong> — You'll need just as many digital tools as physical.</li>
+
+                </ul>
+            
+                <p><strong>Need an example?</strong> <a href="https://elvisoranthamatthews.wixsite.com/portifolio" target="_blank" style="text-decoration: underline;">Take a peek at someone who has created one!</a></p>
+            
+              </div>
+
+            </div>
+            
+
+            <div id="Importance" class="page">
+
+              <div class="content">
+            
+                <h1>Why Every Programming Student Needs a Portfolio</h1>
+            
+                <p>
+                  Let's be real: a resume alone isn't enough anymore. In the tech world, <strong>showing</strong> what you can do beats <strong>telling</strong> every time. Employers, recruiters, and even fellow developers want more than just a bullet-point list of skills—they want evidence. That's where your portfolio comes in.
+                </p>
+            
+                <p>
+                  A portfolio is your personal tech stage. It's where you demonstrate your <strong>growth, creativity, and technical thinking</strong>. Whether you're applying for internships, junior dev roles, freelance projects, or just trying to stand out on LinkedIn, your portfolio is the proof that you're not just learning—you're building.
+                </p>
+            
+                <h3>Here's What a Great Portfolio Can Do for You:</h3>
+
+                <ul style="line-height: 1.8;">
+
+                  <li><strong>Showcase real work</strong> - Code is great, but context is better. A portfolio allows you to explain the "why" behind your projects, not just the "what."</li>
+
+                  <li><strong>Tell your story</strong> - Share your journey into programming, what drives you, and how you've applied your skills in practical ways.</li>
+
+                  <li><strong>Stand out in a sea of resumes</strong> - Hiring managers see hundreds of applicants. A portfolio gives them a reason to remember you.</li>
+
+                  <li><strong>Highlight your problem-solving skills</strong> - Break down how you approached challenges, made decisions, and delivered results.</li>
+
+                  <li><strong>Open doors to opportunities</strong> - Whether it's a DM on LinkedIn or a conversation at a hackathon, a portfolio makes it easy for others to find and appreciate your work.</li>
+
+                </ul>
+            
+                <h3>"But I'm Still Learning..." — Exactly Why You Should Start Now</h3>
+
+                <p>
+                  You don't need to be a senior developer or have a Computer Science degree to start building a portfolio. In fact, the earlier you start, the better. A student portfolio isn't about perfection—it's about <strong>progress</strong>. It's your chance to:
+                </p>
+
+                <ul style="line-height: 1.8;">
+
+                  <li>Track how far you've come and reflect on what you've learned.</li>
+
+                  <li>Build a habit of documenting and sharing your work.</li>
+
+                  <li>Show initiative and self-direction—qualities employers absolutely love.</li>
+
+                </ul>
+            
+                <h3>What Employers Actually Look For</h3>
+
+                <p>
+                  Technical recruiters and hiring managers often don't have time to dig through raw code. But they will click a link to your site. They're looking for:
+                </p>
+
+                <ul style="line-height: 1.8;">
+
+                  <li><strong>Clean, responsive design</strong> - Is it easy to navigate and mobile-friendly?</li>
+                  
+                  <li><strong>Well-explained projects</strong> - Can they understand what your project does without reading the code?</li>
+
+                  <li><strong>Consistent GitHub activity</strong> - Are you pushing commits, using branches, and writing clear READMEs?</li>
+
+                  <li><strong>Unique perspective</strong> - Your take on a project or problem is valuable. Don't shy away from adding personal insights.</li>
+
+                </ul>
+            
+                <p>
+                  This is also where <a href="https://github.com" target="_blank">GitHub</a> becomes your best friend. Host your code, keep version control clean, and treat every repo like it might be seen by a hiring manager. Add a README, use commit messages that make sense, and include screenshots or demo links where possible.
+                </p>
+            
+                <h3>And Here's the Best Part:</h3>
+
+                <p>
+                  Your portfolio grows with you. What you build today may feel small, but six months from now you'll look back and see a trail of progress. That kind of personal growth—and the ability to reflect it clearly—is exactly what makes students turn into great developers.
+                </p>
+            
+                <h3>Start Small. Stay Consistent. Share Often.</h3>
+
+                <p>
+                  You don't need to build a complex site with animations and a headless CMS. Start with a simple HTML/CSS layout. Add one project. Then another. Update your "About Me" section. Include links to your <a href="https://linkedin.com" target="_blank">LinkedIn</a> and <a href="https://github.com" target="_blank">GitHub</a>. Focus on <strong>clarity over complexity</strong>.
+                </p>
+            
+                <p>
+                  A great portfolio isn't about being perfect—it's about being visible, being consistent, and being <strong>you</strong>.
+                </p>
+
+                <div class="Importance-container">
+
+                  <div id="Importance-image">
+
+                    <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*hin6e9kj3PvwBFM9cIyzmw.png" alt="Student portfolio homepage example">
+
+                  </div>
+                
+                  <div id="Importance-tips">
+
+                    <h3 style="margin-top: 30px;">Want to Stand Out Even More?</h3>
+
+                    <p>
+                      Record a short intro video or project walkthrough. Write a blog post explaining how you built something. 
+                      Share your site on developer forums or in class. Every time you share, you learn how to talk about your work better—and that's a huge asset in interviews.
+                    </p>
+
+                  </div>
+
+                </div>
+            
+              </div>
+
+            </div>
+            
+
+            <div id="Includes" class="page">
+
+              <div class="content">
+
+                <div class="Include-container">
+  
+                  <div id="Include-tips">
+
+                    <h2>Essential Portfolio Components</h2>
+
+                    <p>
+                      Your portfolio is more than a digital résumé—it's your personal brand. Think of it as a dynamic space where you showcase not just <strong>what</strong> you've learned, but <strong>how</strong> you've grown as a programmer. Recruiters and hiring managers want to see your story, your passion, and how you solve real problems with code.
+                    </p>
+            
+                    <h3>What to Include</h3>
+
+                    <ul style="line-height: 1.6;">
+
+                      <li><strong>About Me</strong> - Share a brief intro about who you are, what drives you, and your journey into programming. Keep it authentic and focused.</li>
+                      
+                      <li><strong>Projects</strong> - Choose 3-5 of your best projects. Include a clear description, the tech stack used, your role, challenges you overcame, and a link to the live project or GitHub repo.</li>
+                      
+                      <li><strong>Skills</strong> - Highlight your key programming languages, tools, and frameworks. Organize by category if needed (e.g. Frontend, Backend, DevOps).</li>
+                      
+                      <li><strong>Résumé</strong> - Embed a viewable PDF and offer a downloadable link. Ensure it's up to date and matches your portfolio's branding.</li>
+                      
+                      <li><strong>Contact Info</strong> - Make it easy to reach you. Include your email, LinkedIn profile, GitHub, and any relevant professional platforms.</li>
+                    
+                    </ul>
+            
+                    <p>
+                      <em>Tip:</em> Tailor your portfolio to your goal. Are you looking for a web dev internship? Focus your examples and skills accordingly.
+                    </p>
+
+                  </div>
+
+                  <div id="Include-image">
+
+                    <div id="Include-image" style="width: 190px; height: 520px; overflow: hidden; border-radius: 16px">
+
+                      <img src="https://kinsta.com/wp-content/uploads/2019/01/portfolio-website-thumbnail-gallery-1536x766.jpeg" alt="Tool Image" style="width: 1400px; height: 5370px; object-fit: none; object-position: -500px -200px;">
+                    
+                    </div>
+
+                  </div>
+
+                </div>
+            
+                <img src="https://www.designveloper.com/wp-content/uploads/2021/08/website-portfolio-1024x768.jpeg" alt="Portfolio Example Screenshot" style="width: 100%; max-width: 100%; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            
+              </div>
+
+          </div>
+            
+
+          <div id="Design" class="page">
+
+              <div class="content">
+
+                <h2>How to Build Your Portfolio: Tools & Platforms</h2>
+                
+                <h3>No Designer? No Problem.</h3>
+
+                <p>
+                  You don't need to be a design expert to create a clean, professional-looking portfolio. Thanks to modern tools and templates, you can launch a solid site even with just basic <strong>HTML</strong> and <strong>CSS</strong> skills.
+                </p>
+                
+                <h3>From Zero to Live: Platforms to Get You Started</h3>
+
+                <p>
+                  Below is a curated list of popular platforms and tools—whether you're building with no-code solutions or diving into front-end frameworks:
+                </p>
+            
+                <h4>Beginner-Friendly Options</h4>
+
+                <ul style="line-height: 1.6;">
+
+                  <li><strong>GitHub Pages</strong> - Free, great for hosting static sites directly from a repo.</li>
+
+                  <li><strong>Netlify + HTML/CSS Template</strong> - Super easy to deploy. Pick a template and push live with drag-and-drop simplicity.</li>
+
+                  <li><strong>Carrd or Notion</strong> - Non-traditional options for quick personal sites, especially useful if you're still learning to code.</li>
+
+                </ul>
+            
+                <h4>Advanced/Customizable Options</h4>
+
+                <ul style="line-height: 1.6;">
+
+                  <li><strong>React</strong> - Use frameworks like <code>Vite</code> or <code>Next.js</code> to create interactive, modern UIs.</li>
+
+                  <li><strong>Static Site Generators</strong> - Tools like <code>Jekyll</code> or <code>Hugo</code> are great for fast, blog-style or markdown-based sites.</li>
+
+                </ul>
+            
+                <h4>Developer Tools to Know</h4>
+
+                <ul style="line-height: 1.6;">
+
+                  <li><strong>Version Control</strong> - Use Git and GitHub to track changes, collaborate, and host your site.</li>
+
+                  <li><strong>Hosting</strong> - Netlify and GitHub Pages are both free and reliable for student projects.</li>
+
+                  <li><strong>Code Editors & CLI</strong> - VS Code + terminal = essential combo for editing and deploying projects.</li>
+
+                </ul>
+            
+                <p>
+                  <em>Pro Tip:</em> Start simple. Build confidence by launching a basic HTML/CSS version, then refactor or rebuild with React or another tool once you're ready.
+                </p>
+            
+                <a href="https://youtu.be/nlSgxeT2_dc?si=z5EPVnzI8XYA-4Xp" target="_blank" rel="noopener noreferrer" class="video-thumbnail">
+
+                  <img src="https://i.ytimg.com/vi/nlSgxeT2_dc/maxresdefault.jpg" alt="Watch video">
+
+                  <div class="play-button">▶</div>
+
+                </a>
+
+              </div>
+
+          </div>
+
+          <div id="Showcase" class="page">
+
+            <div class="content">
+          
+              <h1>Clean, Simple, Effective: Portfolio Design for Programmers</h1>
+          
+              <p>
+                As programmers, it's easy to prioritize the backend or code logic and overlook visual design. But design matters—a lot. A clean, responsive, and user-friendly portfolio keeps people engaged and encourages them to explore your work further. You don't have to be a designer to make something professional. Here are practical, no-fluff design tips that make a big difference.
+              </p>
+
+              <div class="design-container">
+
+                <div id="design-tips">
+                
+                  <h3>Keep It Simple</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li>Use whitespace strategically to reduce visual clutter and create breathing room.</li>
+
+                    <li>Stick to 2-3 font families and a minimal color palette to maintain visual consistency.</li>
+
+                  </ul>
+                
+                  <h3>Make It Responsive</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li>Use modern layout systems like <code>Flexbox</code> or <code>CSS Grid</code> to handle different screen sizes smoothly.</li>
+
+                    <li>Test your site on both mobile and tablet views—employ browser dev tools or free online testers.</li>
+
+                  </ul>
+                
+                  <h3>Focus on Usability</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li>Keep navigation intuitive and easy to find—consider a sticky header or anchored side menu.</li>
+
+                    <li>Structure your project sections clearly, and include strong calls to action (e.g., "View Code", "Try Live Demo").</li>
+
+                  </ul>
+
+                </div>
+
+                <div id="design-image">
+
+                  <img src="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*5a0_sXxdX-XL705gftBatA.png" alt="Portfolio design example" style="width: 100%; max-width: 600px; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                  
+                  <img src="https://www.justinmind.com/wp-content/webp-express/webp-images/uploads/2021/11/split-screen-web-design-portfolio-template.png.webp" alt="Portfolio design example" style="width: 100%; max-width: 600px; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+
+                </div>
+
+              </div>
+          
+              <p>
+                Every section on your site should be intentional. <strong>"About Me"</strong> tells your story and introduces who you are. <strong>"Projects"</strong> showcases your technical thinking and real-world application of skills. Don't forget to link out:
+
+                <ul>
+
+                  <li><a href="https://www.linkedin.com" target="_blank">LinkedIn</a> - For your professional summary and connections.</li>
+
+                  <li><a href="https://github.com" target="_blank">GitHub</a> - To display repositories, READMEs, and contribution history.</li>
+
+                </ul>
+
+              </p>
+          
+              <p>
+                Want to launch quickly? Use <a href="https://pages.github.com" target="_blank">GitHub Pages</a> to deploy an HTML/CSS site straight from a repository. If you're comfortable with frameworks, try <a href="https://vercel.com" target="_blank">Vercel</a> or <a href="https://www.netlify.com" target="_blank">Netlify</a> with a modern stack like React, Astro, or Svelte.
+              </p>
+          
+              <p>
+                Don't just showcase code—highlight your process. Explain key design or architecture decisions, challenges you faced, and what you learned. Use GitHub READMEs to document each project with clarity. Add visuals like screenshots and badges using <a href="https://shields.io" target="_blank">Shields.io</a> for things like build status or test coverage.
+              </p>
+                    
+            </div>
+
+          </div>
+          
+
+          <div id="Services" class="page">
+
+            <div class="content">
+          
+              <h1>Tell the Story Behind Your Code</h1>
+          
+              <p>
+                Projects are the core of any strong portfolio—but just dropping in code and screenshots won't cut it. Recruiters and hiring managers want to know how you think, how you solve problems, and how you communicate. Every project should tell a story: what the goal was, how you approached it, and what you learned.
+              </p>
+
+              <div class="Service-container">
+
+                <div id="Service-tips">
+          
+                  <h3>What to Include for Each Project</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><strong>Project Title + Short Description</strong> - Summarize what the project does in 1-2 sentences.</li>
+
+                    <li><strong>Tech Stack</strong> - List the main languages, frameworks, and tools used.</li>
+
+                    <li><strong>Key Features</strong> - Highlight what makes the project functional, useful, or unique.</li>
+
+                    <li><strong>Links</strong> - Include a GitHub repo, live demo, and/or screenshots (where possible).</li>
+
+                  </ul>
+                
+                  <h3>Tips for Writing Project Descriptions</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><strong>Write for non-developers</strong> - Assume your reader isn't technical. Can they understand what your project does and why it matters?</li>
+
+                    <li><strong>Mention teamwork</strong> - If you collaborated, highlight your specific role and how you worked as part of a group.</li>
+
+                    <li><strong>Show problem-solving</strong> - Talk about technical or creative challenges and how you overcame them.</li>
+
+                    <li><strong>Highlight impact</strong> - Did a decision save development time? Improve user experience? Optimize performance?</li>
+
+                  </ul>
+                
+                </div>
+
+                <div id="Service-image" style="width: 430px; height: 530px; overflow: hidden; border-radius: 16px;">
+
+                  <img src="https://images.pexels.com/photos/8199761/pexels-photo-8199761.jpeg" style="width: auto; height: 100%; object-fit: cover; transform: translate(-20%);">
+                
+                </div>
+
+              </div>
+          
+              <p>
+                Think of each project like a mini case study. Go beyond the code and showcase your decision-making process, your adaptability, and your ability to explain complex ideas clearly.
+              </p>
+          
+              <p>
+                To help your presentation stand out, use <a href="https://github.com" target="_blank">GitHub</a> READMEs that are well-written and include visuals—like screenshots or screen recordings. You can even use <a href="https://shields.io" target="_blank">Shields.io</a> to add status badges for build success, test coverage, or version info.
+              </p>
+          
+              <p>
+                Finally, don't forget to link your projects to relevant profiles like <a href="https://www.linkedin.com" target="_blank">LinkedIn</a> and your GitHub portfolio. Consistency across your personal brand matters!
+              </p>
+          
+              <img src="https://img.freepik.com/free-vector/thinking-face-concept-illustration_114360-8004.jpg?t=st=1744419355~exp=1744422955~hmac=cdea8a717b3fdec1aee14a54de60492ef0d31b92e288ee07311f3bac6cfe8827&w=740" alt="Project showcase example screenshot" style="width: 50%; max-width: 600px; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><img src="https://img.freepik.com/free-vector/studying-concept-illustration_114360-1301.jpg?t=st=1744419321~exp=1744422921~hmac=e58dd48f34029ca2bb531cd9614484dc1acaff2fb20916ea92b13f18bba7fa00&w=740" alt="Project showcase example screenshot" style="width: 50%; max-width: 600px; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+          
+            </div>
+
+          </div>
+          
+
+          <div id="Tools" class="page">
+
+            <div class="content">
+          
+              <h1>Helpful Tools</h1>
+
+              <p>
+                These are some of the most useful platforms, tools, and communities you can use when building, improving, and sharing your portfolio. Many of these were mentioned throughout this site—this is your one-stop spot to find them again.
+              </p>
+
+              <div class="Tool-container">
+
+                <div id="Tool-tips">
+          
+                  <h3>Development & Deployment</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><a href="https://github.com" target="_blank">GitHub</a> - Source control, collaboration, and project hosting.</li>
+
+                    <li><a href="https://pages.github.com" target="_blank">GitHub Pages</a> - Deploy static sites straight from a repo.</li>
+
+                    <li><a href="https://www.netlify.com" target="_blank">Netlify</a> - Fast, free static site deployment with custom domains.</li>
+
+                    <li><a href="https://vercel.com" target="_blank">Vercel</a> - Ideal for React, Next.js, and frontend frameworks.</li>
+
+                  </ul>
+                
+                  <h3>Design, Layout & UI Inspiration</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><a href="https://dribbble.com" target="_blank">Dribbble</a> - Design inspiration from real UI/UX projects.</li>
+
+                    <li><a href="https://www.behance.net" target="_blank">Behance</a> - Portfolios from designers and developers alike.</li>
+
+                    <li><a href="https://www.frontendmentor.io" target="_blank">Frontend Mentor</a> - Practice with real-world UI challenges.</li>
+
+                  </ul>
+                
+                  <h3>Code, Testing & Documentation</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><a href="https://codepen.io" target="_blank">CodePen</a> - Sandbox for experimenting with HTML, CSS, and JS.</li>
+
+                    <li><a href="https://jsfiddle.net" target="_blank">JSFiddle</a> - Another great playground for testing frontend snippets.</li>
+
+                    <li><a href="https://developer.mozilla.org/en-US/" target="_blank">MDN Web Docs</a> - Deep, reliable docs for everything web.</li>
+
+                    <li><a href="https://stackoverflow.com" target="_blank">Stack Overflow</a> - The go-to Q&A site for developers at any level.</li>
+
+                    <li><a href="https://shields.io" target="_blank">Shields.io</a> - Create custom badges for your GitHub READMEs (build status, test coverage, etc.).</li>
+
+                  </ul>
+                
+                  <h3>Video Recording & Demos</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><a href="https://www.loom.com" target="_blank">Loom</a> - Record quick walkthroughs of your projects with voiceover.</li>
+
+                    <li><a href="https://obsproject.com/" target="_blank">OBS Studio</a> - Open-source video recording and streaming software.</li>
+
+                    <li><a href="https://screenpal.com/" target="_blank">ScreenPal</a> (formerly Screencast-O-Matic) - Easy video capture tool for tutorials and demos.</li>
+
+                  </ul>
+                
+                  <h3>Recommended Image Types for Portfolios</h3>
+
+                  <ul style="line-height: 1.6;">
+
+                    <li><strong>Homepage screenshots</strong> - Show how your site looks at first glance (desktop and mobile).</li>
+
+                    <li><strong>Project UI/UX interfaces</strong> - Highlight clean layouts, forms, or user flows you've coded.</li>
+                    
+                    <li><strong>Code snippets (optional)</strong> - Use tools like <a href="https://carbon.now.sh" target="_blank">Carbon</a> to turn code into beautiful images.</li>
+                  
+                  </ul>
+
+                </div>
+
+                <div id="Tool-image" style="width: 400px; height: 775px; overflow: hidden; border-radius: 128px;">
+
+                  <img src="https://themeui.net/wp-content/uploads/2019/11/devicons.jpg" alt="Tool Image" style="width: 1400px; height: 5370px; object-fit: none; object-position: -410px -1830px;">
+                
+                </div>
+
+            </div>
+          
+              <p style="margin-top: 30px;">
+                These tools are just the starting point. Explore, experiment, and don't be afraid to try new things. Every tool you learn builds your confidence and expands your creative options.
+              </p>
+          
+            </div>
+
+          </div>
+
+          <div id="References" class="page">
+
+            <div class="content">
+          
+              <h1>References</h1>
+
+              <p>Below are citations for any third-party resources, images, or media used within this site.</p>
+          
+              <ol style="line-height: 1.8;">
+
+                <li>
+                  Mozilla Foundation. (n.d.). <em>HTML: HyperText Markup Language</em>. MDN Web Docs. Retrieved April 11, 2025, from 
+                  <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">https://developer.mozilla.org/en-US/docs/Web/HTML</a>
+                </li>
+
+                <li>
+                  GitHub, Inc. (n.d.). <em>GitHub Pages</em>. Retrieved April 11, 2025, from 
+                  <a href="https://pages.github.com/" target="_blank">https://pages.github.com/</a>
+                </li>
+
+                <li>
+                  Coolors. (n.d.). <em>Color palette generator</em>. Retrieved from 
+                  <a href="https://coolors.co" target="_blank">https://coolors.co</a>
+                </li>
+
+                <li>
+                  Loom, Inc. (n.d.). <em>Loom video recording tool</em>. Retrieved from 
+                  <a href="https://www.loom.com" target="_blank">https://www.loom.com</a>
+                </li>
+
+                <li>
+                  Shields.io. (n.d.). <em>Status badges for GitHub READMEs</em>. Retrieved from 
+                  <a href="https://shields.io" target="_blank">https://shields.io</a>
+                </li>
+
+                <li>
+                  Pexels. (n.d.). <em>Students Studying Together while Looking at the Screen of a Laptop</em>. Retrieved from 
+                  <a href="https://www.pexels.com/photo/students-studying-together-while-looking-at-the-screen-of-a-laptop-8199761/" target="_blank">https://www.pexels.com</a>
+                </li>
+
+                <li>
+                  Unsplash. (n.d.). <em>[Photographer Name], [Image Title if given]</em>. Retrieved from 
+                  <a href="https://www.unsplash.com" target="_blank">https://www.unsplash.com</a>
+                </li>
+
+                <li>
+                  Designveloper. (n.d.). <em>How to Make Your Own Website With 10 Effective Website Builders</em>. Retrieved from 
+                  <a href="https://www.designveloper.com/blog/how-to-make-your-own-website/" target="_blank">https://www.designveloper.com</a>
+                </li>
+
+                <li>
+                  Freepik. (n.d.). <em>[Thinking face illustrations]</em>. Retrieved April 11, 2025, from 
+                  <a href="https://www.freepik.com/free-vector/thinking-face-concept-illustration_20908907.htm#fromView=keyword&page=1&position=0&uuid=6532e4fc-268c-4c00-8aca-63222ad73985&query=Thinking+Writing" target="_blank">https://www.freepik.com</a>
+                </li>
+
+                <li>
+                  Freepik. (n.d.). <em>[Studying illustrations]</em>. Retrieved April 11, 2025, from 
+                  <a href="https://www.freepik.com/free-vector/studying-concept-illustration_7119041.htm#fromView=keyword&page=1&position=3&uuid=29ad1e3f-e664-439a-9e27-66e5f873dd7a&query=Student+Studying+Table" target="_blank">https://www.freepik.com</a>
+                </li>
+
+                <li>
+                  Justinmind. (n.d.). <em>Web design portfolios: principles, examples and sites</em>. Retrieved from 
+                  <a href="https://www.justinmind.com/web-design/portfolio" target="_blank">https://www.justinmind.com</a>
+                </li>
+
+                <li>
+                  Kinsta. (n.d.). <em>The Anatomy of a Perfect Portfolio Website to Showcase Your Work </em>. Retrieved from 
+                  <a href="https://kinsta.com/blog/portfolio-website/" target="_blank">https://kinsta.com</a>
+                </li>
+
+                <li>
+                  Medium. (n.d.). <em>8 Student Websites to Influence Your Own</em>. Retrieved from 
+                  <a href="https://medium.com/@meyrehay/8-student-websites-to-influence-your-own-1088cd61f7c1" target="_blank">https://miro.medium.com</a>
+                </li>
+
+                <li>
+                  Medium. (n.d.). <em>The Essential Guide to a Stellar Design Portfolio</em>. Retrieved from 
+                  <a href="https://miro.medium.com/v2/resize:fit:720/format:webp/1*hin6e9kj3PvwBFM9cIyzmw.png" target="_blank">https://miro.medium.com</a>
+                </li>
+
+                <li>
+                  ThemeUI. (n.d.). <em>Devicon — Programming Languages & Development Tools Related Icons</em>. Retrieved from 
+                  <a href="https://themeui.net/devicon-programming-languages-development-tools-related-icons/" target="_blank">https://themeui.net</a>
+                </li>
+
+                <li>
+                  deviantart.com. (n.d.). <em>[Matrix wallpaper background image]</em>. Retrieved from 
+                  <a href="https://www.deviantart.com/treshkudrago/art/Matrix-Binary-Code-wallpaper-By-Treshku-339808176" target="_blank">https://www.deviantart.com</a>
+                </li>
+
+                <li>
+                  YouTube. (2023, July 14). <em>How to build a dev portfolio (walkthrough)</em> [Video]. YouTube. 
+                  <a href="https://youtu.be/nlSgxeT2_dc" target="_blank">https://youtu.be/nlSgxeT2_dc</a>
+                </li>
+
+              </ol>
+          
+            </div>
+
+          </div>
+
+            <div id="Logo" class="page"><div class="content">
+
+                <a href="https://github.com/Aubacity/COMM2019-Website" target="_blank" id="logo-repository">
+
+                    <svg height="32" aria-hidden="true" viewBox="0 0 24 24" version="1.1" width="32" data-view-component="true" class="octicon octicon-mark-github v-align-middle"><path d="M12 1C5.9225 1 1 5.9225 1 12C1 16.8675 4.14875 20.9787 8.52125 22.4362C9.07125 22.5325 9.2775 22.2025 9.2775 21.9137C9.2775 21.6525 9.26375 20.7862 9.26375 19.865C6.5 20.3737 5.785 19.1912 5.565 18.5725C5.44125 18.2562 4.905 17.28 4.4375 17.0187C4.0525 16.8125 3.5025 16.3037 4.42375 16.29C5.29 16.2762 5.90875 17.0875 6.115 17.4175C7.105 19.0812 8.68625 18.6137 9.31875 18.325C9.415 17.61 9.70375 17.1287 10.02 16.8537C7.5725 16.5787 5.015 15.63 5.015 11.4225C5.015 10.2262 5.44125 9.23625 6.1425 8.46625C6.0325 8.19125 5.6475 7.06375 6.2525 5.55125C6.2525 5.55125 7.17375 5.2625 9.2775 6.67875C10.1575 6.43125 11.0925 6.3075 12.0275 6.3075C12.9625 6.3075 13.8975 6.43125 14.7775 6.67875C16.8813 5.24875 17.8025 5.55125 17.8025 5.55125C18.4075 7.06375 18.0225 8.19125 17.9125 8.46625C18.6138 9.23625 19.04 10.2125 19.04 11.4225C19.04 15.6437 16.4688 16.5787 14.0213 16.8537C14.42 17.1975 14.7638 17.8575 14.7638 18.8887C14.7638 20.36 14.75 21.5425 14.75 21.9137C14.75 22.2025 14.9563 22.5462 15.5063 22.4362C19.8513 20.9787 23 16.8537 23 12C23 5.9225 18.0775 1 12 1Z" /></svg><span>Github Repository</span></a>
+
+                <h4>Show Website Code</h4>
+
+                <pre id="code-block"></pre>
+
+            </div>
+
+          </div>
+          
+        </div>
+
+        <script>
+
+            let currentPage = document.querySelector('.page.active');
+
+            function changePage(targetId) {
+              if (!targetId || (currentPage && currentPage.id === targetId)) return;
+
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+
+              const nextPage = document.getElementById(targetId);
+              if (!nextPage) {
+                console.error(`Page with id "${targetId}" not found.`);
+                return;
+              }
+
+              const allPages = document.querySelectorAll('.page');
+              allPages.forEach((page) => {
+                page.classList.remove('active');
+              });
+
+              nextPage.classList.add('active');
+              currentPage = nextPage;
+
+              const sideLinks = document.querySelectorAll('.side-links a');
+              sideLinks.forEach((link) => {
+                if (link.getAttribute('onclick')?.includes(targetId)) {
+                  link.classList.add('active-link');
+                } else {
+                  link.classList.remove('active-link');
+                }
+              });
+            }
+
+            function toggleMobileMenu() {
+              const menu = document.getElementById('mobileMenu');
+              menu.classList.toggle('show');
+            }
+
+            function isMobileDevice() {
+              return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 1280;
+            }
+
+            window.onload = () => {
+              console.log("Device:", isMobileDevice() ? "Mobile" : "Desktop");
+            };
+
+            window.addEventListener('resize', () => {
+              const sideLinks = document.getElementById('sideLinks');
+              const pageContainer = document.getElementById('page-container');
+              if (window.innerWidth >= 1280) {
+                sideLinks.classList.add('show');
+                pageContainer.classList.add('shifted');
+              } else {
+                sideLinks.classList.remove('show');
+                pageContainer.classList.remove('shifted');
+              }
+            });
+
+            window.addEventListener('load', () => {
+              const sideLinks = document.getElementById('sideLinks');
+              const pageContainer = document.getElementById('page-container');
+              if (window.innerWidth >= 1280) {
+                sideLinks.classList.add('show');
+                pageContainer.classList.add('shifted');
+              }
+            });
+
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+        <script>
+
+            async function loadHTMLSource() {
+                try {
+                  const response = await fetch('index.html');
+                  const htmlText = await response.text();
+                
+                  const codeEl = document.getElementById('code-block');
+                  codeEl.textContent = htmlText;
+                  hljs.highlightElement(codeEl);
+                } catch (err) {
+                  document.getElementById('code-block').textContent = '⚠️ Failed to load HTML source.';
+                  console.error(err);
+                }
+            }
+        
+            window.onload = loadHTMLSource;
+
+        </script>
+
+    </body>
+
+</html>
