@@ -1,17 +1,20 @@
 // Load navbar and footer components
 async function loadComponents() {
     try {
+        // Create promises for both components
+        const navbarPromise = fetch('navbar.html').then(response => response.text());
+        const footerPromise = fetch('footer.html').then(response => response.text());
+        
+        // Wait for both to complete
+        const [navbarHTML, footerHTML] = await Promise.all([navbarPromise, footerPromise]);
+        
         // Load navbar
-        const navbarResponse = await fetch('navbar.html');
-        const navbarHTML = await navbarResponse.text();
         const navbar = document.getElementById('navbar');
         if (navbar) {
             navbar.innerHTML = navbarHTML;
         }
 
         // Load footer
-        const footerResponse = await fetch('footer.html');
-        const footerHTML = await footerResponse.text();
         const footer = document.getElementById('footer');
         if (footer) {
             footer.innerHTML = footerHTML;
@@ -23,10 +26,30 @@ async function loadComponents() {
         // Initialize mobile menu after navbar is loaded
         initializeMobileMenu();
         
+        return true; // Indicate successful loading
+        
     } catch (error) {
         console.error('Error loading components:', error);
         // Fallback: if components can't be loaded, the existing HTML will remain
+        return false;
     }
+}
+
+// Hide loading screen and show page content
+function showPage() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    const body = document.body;
+    
+    if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        // Remove loading screen from DOM after transition completes
+        setTimeout(() => {
+            loadingScreen.remove();
+        }, 300);
+    }
+    
+    // Show the main content
+    body.classList.add('loaded');
 }
 
 // Initialize mobile menu functionality
@@ -51,17 +74,29 @@ function initializeMobileMenu() {
 }
 
 // Mobile Navigation Toggle and Component Loading
-document.addEventListener('DOMContentLoaded', function() {
-    // Load components first
-    loadComponents();
-    
-    // If components aren't being used (fallback), initialize existing navigation
-    setTimeout(() => {
-        if (!document.getElementById('navbar')) {
-            initializeMobileMenu();
-            setActiveNavigation();
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Load components and wait for completion
+        const componentsLoaded = await loadComponents();
+        
+        // Add a small delay to ensure all rendering is complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Show the page
+        showPage();
+        
+        // If components failed to load, initialize fallback navigation
+        if (!componentsLoaded) {
+            setTimeout(() => {
+                initializeMobileMenu();
+                setActiveNavigation();
+            }, 100);
         }
-    }, 100);
+    } catch (error) {
+        console.error('Error during page initialization:', error);
+        // Still show the page even if there were errors
+        showPage();
+    }
 
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
