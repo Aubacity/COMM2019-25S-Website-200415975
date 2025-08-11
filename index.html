@@ -3,31 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to My Website</title>
+  <title>200415975 Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
   <link rel="stylesheet" href="css/index.css" />
 </head>
 <body>
-  <header>
-    <h1>Welcome to My Website</h1>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">About</a>
-      <a href="#">Projects</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
+  <!-- Navbar -->
+  <div id="navbar"></div>
 
   <main>
+    <!-- Hero Section -->
     <section class="hero">
-      <h2>Virtual Communication Project</h2>
-      <p>This is a basic homepage hosted with GitHub Pages for my virtual communication course.</p>
-      <button id="learnMoreBtn">Learn More (All links Disabled)</button>
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>Welcome to my Portfolio</h1>
+          <h2>Computer Programming Analyst Student</h2>
+          <p class="lead">Passionate about creating innovative software solutions and building the future through code.</p>
+          <div class="hero-buttons">
+            <a href="about.html" class="btn btn-primary">Learn About Me</a>
+            <a href="projects.html" class="btn btn-secondary">View My Work</a>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img src="./files/image0.jpg" alt="Professional headshot" />
+          <p class="image-credit" style="color: #ccc;">Image Credit: S. Joseph C. - Original photo</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Introduction Section -->
+    <section class="intro">
+      <div class="container">
+        <h2>Building Tomorrow's Technology Today</h2>
+        <p>I am a dedicated Computer Programming Analyst student at Georgian College, passionate about developing efficient, user-friendly software solutions. This portfolio showcases my journey in technology, from academic projects to professional aspirations.</p>
+        
+        <div class="features">
+          <div class="feature-card">
+            <div class="feature-icon">💻</div>
+            <h3>Full-Stack Development</h3>
+            <p>Proficient in both front-end and back-end technologies, creating complete web applications from concept to deployment.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h3>Problem Solving</h3>
+            <p>Strong analytical skills with a focus on finding efficient solutions to complex programming challenges.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3>Continuous Learning</h3>
+            <p>Committed to staying current with emerging technologies and industry best practices through ongoing education.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bio Section -->
+    <section class="quick-bio">
+      <div class="container">
+        <div class="bio-content">
+          <div class="bio-text">
+            <h2>A Brief Introduction</h2>
+            <p>As a Computer Programming Analyst student, I combine creativity with technical expertise to develop innovative software solutions. My academic journey has equipped me with a solid foundation in programming languages, database management, and software development methodologies.</p>
+            <p>I believe in the power of technology to solve real-world problems and improve people's lives. Whether it's developing a user-friendly web application or optimizing database performance, I approach each project with enthusiasm and attention to detail.</p>
+            <a href="about.html" class="btn btn-outline">Read My Full Story</a>
+          </div>
+          <div class="bio-image">
+            <img src="./files/image1.png" alt="Programming workspace setup" />
+            <p class="image-credit">Image Credit: S. Joseph C. - Original photo</p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>&copy; 2025 - SC - 200415975. All rights reserved.</p>
-  </footer>
+  <!-- Footer -->
+  <div id="footer"></div>
 
   <script src="js/index.js"></script>
 </body>
